@@ -1,3 +1,5 @@
+# -*- coding:utf-8 -*-
+
 import requests
 import re
 import sqlite3
@@ -60,6 +62,7 @@ def get_table(header, s):
 def act_with_database(note_dict):
     conn = sqlite3.connect('TJ_notice.db')
     cursor = conn.cursor()
+    notice_list = []
     for key in note_dict:
         content = note_dict[key]
         cursor.execute('select * from notice where id=?', (key,))
@@ -67,11 +70,34 @@ def act_with_database(note_dict):
         if len(result) == 0:  # 未查询到结果
             cursor.execute('insert into notice (id, title) values (?, ?)', (key, content))
             print('insert one tuple : {}'.format(key))
-        else:
-            print(result)
+            notice_list.append(key)
+        #else:
+            #print(result)
+    cursor.execute('delete from notice where id=?',('5917',))
     cursor.close()
     conn.commit()
     conn.close()
+
+    return notice_list
+
+
+def get_detail(header, s, notice_list):
+    detailURL = 'http://4m3.tongji.edu.cn/eams/noticeDocument!info.action?ifMain=1&notice.id='
+    detail_dict = {}
+    for noticeID in notice_list:
+        oneURL = detailURL + noticeID
+        res = s.get(oneURL, headers=header)
+        soup=BeautifulSoup(res.content,'html.parser')
+        notice_str = ''
+        for ids in soup.find_all('span'):
+            notice_str += ids.get_text()
+
+        notice_str = notice_str.replace(' ','')
+        notice_str = notice_str.replace('\xa0', '')
+        notice_str = notice_str[0:int(len(notice_str)/2)]
+        detail_dict[noticeID] = notice_str
+
+    return detail_dict
 
 
 if __name__ == '__main__':
@@ -83,4 +109,5 @@ if __name__ == '__main__':
     s=requests.session()
     login('1551719','108243',header,s)
     note_dict = get_table(header,s)
-    act_with_database(note_dict)
+    notice_list = act_with_database(note_dict)
+    get_detail(header,s,notice_list)
