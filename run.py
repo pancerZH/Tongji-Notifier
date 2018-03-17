@@ -5,12 +5,16 @@ import re
 import sqlite3
 from bs4 import BeautifulSoup
 import os
-import create_database
+import env_build
 import mail
 
 
-def login(username,password,header,s):
+def login(header,s):
     '''登陆4m3'''
+    with open('TJ','r') as fp:
+        username = fp.readline().strip('\n')
+        password = fp.readline().strip('\n')
+
     startURL='http://4m3.tongji.edu.cn/eams/login.action'
     href='http://4m3.tongji.edu.cn/eams/samlCheck'
     res=s.get(startURL)
@@ -74,9 +78,10 @@ def act_with_database(note_dict):
             cursor.execute('insert into notice (id, title) values (?, ?)', (key, content))
             print('insert one tuple : {}'.format(key))
             notice_list.append(key)
+            env_build.write_to_log('find new notification: {}'.format(note_dict[key]))
         #else:
             #print(result)
-    cursor.execute('delete from notice where id=?',('5917',))
+    #cursor.execute('delete from notice where id=?',('5917',))
     cursor.close()
     conn.commit()
     conn.close()
@@ -110,17 +115,19 @@ def send_to_user(note_dict, detail_dict):
     cursor = conn.cursor()
     cursor.execute('select * from user')
     result = cursor.fetchall()
-    try:
-        pass_file = open('password.key','r')
-    except:
-        print('password file not exist!')
-        exit(3)
-    password = pass_file.readline()
+    with open('mail','r') as fp:
+        host_address = fp.readline().strip('\n')
+        password = fp.readline().strip('\n')
+
     for key in detail_dict:
         title = '【TJ_notifier】' + note_dict[key]
         body = detail_dict[key]
         for mail_address in result:
-            mail.sendMail('942740938@qq.com',password,mail_address[0],title, body)
+            try:
+                mail.sendMail(host_address,password,mail_address[0],title, body)
+                env_build.write_to_log('send a mail to {}'.format(mail_address[0]))
+            except:
+                env_build.write_to_log('failed to send a mail to {}'.format(mail_address[0]))
 
     cursor.close()
     conn.commit()
@@ -128,13 +135,23 @@ def send_to_user(note_dict, detail_dict):
 
 
 if __name__ == '__main__':
+    if os.path.exists('notifier.log') == False:
+        env_build.create_log()
     if os.path.exists('TJ_notice.db') == False:
-        create_database.create_database()
+        env_build.create_database()
+    if os.path.exists('TJ') == False:
+        env_build.create_TJID()
+    if os.path.exists('mail') == False:
+        env_build.create_mail()
+
 
     header={'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8','Accept-Encoding': 'gzip, deflate, sdch',
     'Accept-Language': 'zh-CN,zh;q=0.8','User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36'}
     s=requests.session()
-    login('1551719','108243',header,s)
+    try:
+        login(header,s)
+    except:
+        env_build.write_to_log('failed to log in 4m3')
     note_dict = get_table(header,s)
     notice_list = act_with_database(note_dict)
     detail_dict = get_detail(header,s,notice_list)
