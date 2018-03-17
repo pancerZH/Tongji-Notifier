@@ -6,10 +6,11 @@ import sqlite3
 from bs4 import BeautifulSoup
 import os
 import create_database
+import mail
 
 
 def login(username,password,header,s):
-
+    '''登陆4m3'''
     startURL='http://4m3.tongji.edu.cn/eams/login.action'
     href='http://4m3.tongji.edu.cn/eams/samlCheck'
     res=s.get(startURL)
@@ -47,6 +48,7 @@ def login(username,password,header,s):
 
 
 def get_table(header, s):
+    '''从4m3获取通知标题'''
     tableURL = 'http://4m3.tongji.edu.cn/eams/home!welcome.action'
     res=s.post(tableURL,headers=header)
     soup = BeautifulSoup(res.content,'html.parser')
@@ -60,6 +62,7 @@ def get_table(header, s):
 
 
 def act_with_database(note_dict):
+    '''连接数据库并查询通知'''
     conn = sqlite3.connect('TJ_notice.db')
     cursor = conn.cursor()
     notice_list = []
@@ -82,6 +85,7 @@ def act_with_database(note_dict):
 
 
 def get_detail(header, s, notice_list):
+    """ 获取每条新通知的详细内容 """
     detailURL = 'http://4m3.tongji.edu.cn/eams/noticeDocument!info.action?ifMain=1&notice.id='
     detail_dict = {}
     for noticeID in notice_list:
@@ -100,6 +104,29 @@ def get_detail(header, s, notice_list):
     return detail_dict
 
 
+def send_to_user(note_dict, detail_dict):
+    """ 向每个用户发送通知邮件 """
+    conn = sqlite3.connect('TJ_notice.db')
+    cursor = conn.cursor()
+    cursor.execute('select * from user')
+    result = cursor.fetchall()
+    try:
+        pass_file = open('password.key','r')
+    except:
+        print('password file not exist!')
+        exit(3)
+    password = pass_file.readline()
+    for key in detail_dict:
+        title = '【TJ_notifier】' + note_dict[key]
+        body = detail_dict[key]
+        for mail_address in result:
+            mail.sendMail('942740938@qq.com',password,mail_address[0],title, body)
+
+    cursor.close()
+    conn.commit()
+    conn.close()
+
+
 if __name__ == '__main__':
     if os.path.exists('TJ_notice.db') == False:
         create_database.create_database()
@@ -110,4 +137,5 @@ if __name__ == '__main__':
     login('1551719','108243',header,s)
     note_dict = get_table(header,s)
     notice_list = act_with_database(note_dict)
-    get_detail(header,s,notice_list)
+    detail_dict = get_detail(header,s,notice_list)
+    send_to_user(note_dict,detail_dict)
