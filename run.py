@@ -7,6 +7,8 @@ from bs4 import BeautifulSoup
 import os
 import env_build
 import mail
+import datetime
+import time
 
 
 def login(header,s):
@@ -144,15 +146,21 @@ if __name__ == '__main__':
     if os.path.exists('mail') == False:
         env_build.create_mail()
 
-
     header={'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8','Accept-Encoding': 'gzip, deflate, sdch',
     'Accept-Language': 'zh-CN,zh;q=0.8','User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36'}
-    s=requests.session()
-    try:
-        login(header,s)
-    except:
-        env_build.write_to_log('failed to log in 4m3')
-    note_dict = get_table(header,s)
-    notice_list = act_with_database(note_dict)
-    detail_dict = get_detail(header,s,notice_list)
-    send_to_user(note_dict,detail_dict)
+
+    while True:
+        now_hour = datetime.datetime.now().hour
+        if now_hour is 12 or now_hour is 18:
+            s=requests.session()
+            try:
+                login(header,s)
+            except:
+                env_build.write_to_log('failed to log in 4m3')
+            note_dict = get_table(header,s)
+            notice_list = act_with_database(note_dict)
+            detail_dict = get_detail(header,s,notice_list)
+            send_to_user(note_dict,detail_dict)
+            time.sleep(3700)
+        else:
+            time.sleep(100)
