@@ -6,8 +6,8 @@ from email.header import Header
 
 def sendMail(sender,password,to,subject,body):
 
-    server='smtp.163.com'
-    port=25
+    server='smtp.qq.com'
+    port=587
 
     tolist=to.split(',')
     mBody=MIMEText(body,'plain','gbk')
@@ -18,14 +18,10 @@ def sendMail(sender,password,to,subject,body):
     header=header+'Subject:'+subject+'\n'
     message=header+mBody.as_string()
  
-    try:
-        smtpserver=smtplib.SMTP(server,port)
-        smtpserver.ehlo()
-        smtpserver.starttls()
-        smtpserver.ehlo()
-        smtpserver.login(sender,password)
-        smtpserver.sendmail(sender,tolist,message)
-        print('succeeded to send a mail')
-    except smtplib.SMTPException:
-        print('failed to send a mail')
+    smtpserver=smtplib.SMTP(server,port)
+    smtpserver.ehlo()
+    smtpserver.starttls()
+    smtpserver.ehlo()
+    smtpserver.login(sender,password)
+    smtpserver.sendmail(sender,tolist,message)
     smtpserver.quit()
