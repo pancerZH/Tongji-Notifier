@@ -151,8 +151,8 @@ if __name__ == '__main__':
         if os.path.exists('mail') == False:
             env_build.create_mail()
 
-        now_hour = datetime.datetime.now().hour
-        if now_hour is 12 or now_hour is 18:
+        now_hour = datetime.datetime.utcnow().hour
+        if now_hour is 4 or now_hour is 10:  # 北京时间12点和18点
             s=requests.session()
             try:
                 login(header,s)
