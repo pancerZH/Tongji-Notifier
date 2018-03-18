@@ -6,8 +6,8 @@ from email.header import Header
 
 def sendMail(sender,password,to,subject,body):
 
-    server='smtp.qq.com'
-    port=587
+    server='smtp.163.com'
+    port=25
 
     tolist=to.split(',')
     mBody=MIMEText(body,'plain','gbk')
