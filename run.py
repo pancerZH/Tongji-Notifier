@@ -137,19 +137,20 @@ def send_to_user(note_dict, detail_dict):
 
 
 if __name__ == '__main__':
-    if os.path.exists('notifier.log') == False:
-        env_build.create_log()
-    if os.path.exists('TJ_notice.db') == False:
-        env_build.create_database()
-    if os.path.exists('TJ') == False:
-        env_build.create_TJID()
-    if os.path.exists('mail') == False:
-        env_build.create_mail()
 
     header={'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8','Accept-Encoding': 'gzip, deflate, sdch',
     'Accept-Language': 'zh-CN,zh;q=0.8','User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36'}
 
     while True:
+        if os.path.exists('notifier.log') == False:
+            env_build.create_log()
+        if os.path.exists('TJ_notice.db') == False:
+            env_build.create_database()
+        if os.path.exists('TJ') == False:
+            env_build.create_TJID()
+        if os.path.exists('mail') == False:
+            env_build.create_mail()
+
         now_hour = datetime.datetime.now().hour
         if now_hour is 12 or now_hour is 18:
             s=requests.session()
