@@ -125,12 +125,15 @@ def send_to_user(note_dict, detail_dict):
     for key in detail_dict:
         title = '【TJ_notifier】' + note_dict[key]
         body = detail_dict[key]
+        mail_list = []
         for mail_address in result:
-            try:
-                mail.sendMail(host_address,password,mail_address[0],title, body)
-                env_build.write_to_log('send a mail to {}'.format(mail_address[0]))
-            except:
-                env_build.write_to_log('failed to send a mail to {}'.format(mail_address[0]))
+            mail_list.append(mail_address[0])
+
+        try:
+            mail.sendMail(host_address,password,mail_list,title, body)
+            env_build.write_to_log('send a mail to {}'.format(mail_list))
+        except:
+            env_build.write_to_log('failed to send a mail to {}'.format(mail_list))
 
     cursor.close()
     conn.commit()

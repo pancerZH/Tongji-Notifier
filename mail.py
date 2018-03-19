@@ -4,16 +4,15 @@ import smtplib
 from email.mime.text import MIMEText
 from email.header import Header
 
-def sendMail(sender,password,to,subject,body):
+def sendMail(sender,password,tolist,subject,body):
 
     server='smtp.qq.com'
     port=587
 
-    tolist=to.split(',')
     mBody=MIMEText(body,'plain','gbk')
     subject = Header(subject, 'utf-8').encode()
 
-    header='To:'+to+'\n'
+    header='To:'+';'.join(tolist)+'\n'
     header=header+'From:'+sender+'\n'
     header=header+'Subject:'+subject+'\n'
     message=header+mBody.as_string()
