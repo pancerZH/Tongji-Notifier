@@ -9,6 +9,7 @@ import env_build
 import datetime
 import time
 import general_operation as go
+import extension as ex
 
 
 def login(header,s):
@@ -111,6 +112,7 @@ def deploy():
     note_dict = get_table(header,s)
     notice_list = go.act_with_database(note_dict)
     get_detail(header,s,notice_list)
+    ex.deploy_SSE()
     go.send_to_user({'1':'deploy succeed'},{'1':'begin service...'})
 
     s.close()
@@ -132,6 +134,7 @@ def run_now():
         env_build.create_mail()
 
     s=requests.session()
+    print('running...')
     try:
         login(header,s)
     except:
@@ -141,6 +144,9 @@ def run_now():
     notice_list = go.act_with_database(note_dict)
     detail_dict = get_detail(header,s,notice_list)
     go.send_to_user(note_dict,detail_dict)
+
+    ex.get_SSE_run()
+    print('succeed!')
 
 
 def run_service():
@@ -170,6 +176,8 @@ def run_service():
             notice_list = go.act_with_database(note_dict)
             detail_dict = get_detail(header,s,notice_list)
             go.send_to_user(note_dict,detail_dict)
+
+            ex.get_SSE_run()
             time.sleep(3700)
         else:
             time.sleep(100)
