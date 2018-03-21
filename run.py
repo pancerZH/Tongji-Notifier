@@ -2,14 +2,13 @@
 
 import requests
 import re
-import sqlite3
 from bs4 import BeautifulSoup
 import os
 import sys
 import env_build
-import mail
 import datetime
 import time
+import general_operation as go
 
 
 def login(header,s):
@@ -68,30 +67,6 @@ def get_table(header, s):
     return notice_dict
 
 
-def act_with_database(note_dict):
-    '''连接数据库并查询通知'''
-    conn = sqlite3.connect('TJ_notice.db')
-    cursor = conn.cursor()
-    notice_list = []
-    for key in note_dict:
-        content = note_dict[key]
-        cursor.execute('select * from notice where id=?', (key,))
-        result = cursor.fetchall()
-        if len(result) == 0:  # 未查询到结果
-            cursor.execute('insert into notice (id, title) values (?, ?)', (key, content))
-            print('insert one tuple : {}'.format(key))
-            notice_list.append(key)
-            env_build.write_to_log('find new notification: {}'.format(note_dict[key]))
-        #else:
-            #print(result)
-    #cursor.execute('delete from notice where id=?',('5917',))
-    cursor.close()
-    conn.commit()
-    conn.close()
-
-    return notice_list
-
-
 def get_detail(header, s, notice_list):
     """ 获取每条新通知的详细内容 """
     detailURL = 'http://4m3.tongji.edu.cn/eams/noticeDocument!info.action?ifMain=1&notice.id='
@@ -110,34 +85,6 @@ def get_detail(header, s, notice_list):
         detail_dict[noticeID] = notice_str
 
     return detail_dict
-
-
-def send_to_user(note_dict, detail_dict):
-    """ 向每个用户发送通知邮件 """
-    conn = sqlite3.connect('TJ_notice.db')
-    cursor = conn.cursor()
-    cursor.execute('select * from user')
-    result = cursor.fetchall()
-    with open('mail','r') as fp:
-        host_address = fp.readline().strip('\n')
-        password = fp.readline().strip('\n')
-
-    for key in detail_dict:
-        title = '【TJ_notifier】' + note_dict[key]
-        body = detail_dict[key]
-        mail_list = []
-        for mail_address in result:
-            mail_list.append(mail_address[0])
-
-        try:
-            mail.sendMail(host_address,password,mail_list,title, body)
-            env_build.write_to_log('send a mail to {}'.format(mail_list))
-        except:
-            env_build.write_to_log('failed to send a mail to {}'.format(mail_list))
-
-    cursor.close()
-    conn.commit()
-    conn.close()
 
 
 def deploy():
@@ -162,9 +109,9 @@ def deploy():
         env_build.write_to_log('failed to log in 4m3')
         exit(3)
     note_dict = get_table(header,s)
-    notice_list = act_with_database(note_dict)
+    notice_list = go.act_with_database(note_dict)
     get_detail(header,s,notice_list)
-    send_to_user({'1':'deploy succeed'},{'1':'begin service...'})
+    go.send_to_user({'1':'deploy succeed'},{'1':'begin service...'})
 
     s.close()
     print('deploy succeed!')
@@ -191,9 +138,9 @@ def run_now():
         env_build.write_to_log('failed to log in 4m3')
         exit(3)
     note_dict = get_table(header,s)
-    notice_list = act_with_database(note_dict)
+    notice_list = go.act_with_database(note_dict)
     detail_dict = get_detail(header,s,notice_list)
-    send_to_user(note_dict,detail_dict)
+    go.send_to_user(note_dict,detail_dict)
 
 
 def run_service():
@@ -220,9 +167,9 @@ def run_service():
                 env_build.write_to_log('failed to log in 4m3')
                 exit(3)
             note_dict = get_table(header,s)
-            notice_list = act_with_database(note_dict)
+            notice_list = go.act_with_database(note_dict)
             detail_dict = get_detail(header,s,notice_list)
-            send_to_user(note_dict,detail_dict)
+            go.send_to_user(note_dict,detail_dict)
             time.sleep(3700)
         else:
             time.sleep(100)
