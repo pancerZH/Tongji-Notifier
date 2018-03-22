@@ -33,10 +33,8 @@ def get_SSE_detail(notice_list, s):
         detail = ''
         for line in soup.find_all('p'):
             detail += line.get_text()
-        
-        detail = detail.replace('\r\n','').strip()
-        detail = detail.replace('\xa9','')
-        detail_dict[ids] = detail.replace('\xa0','')
+    
+        detail_dict[ids] = detail
         
     return detail_dict
 

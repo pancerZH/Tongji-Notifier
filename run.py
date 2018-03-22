@@ -77,11 +77,9 @@ def get_detail(header, s, notice_list):
         res = s.get(oneURL, headers=header)
         soup=BeautifulSoup(res.content,'html.parser')
         notice_str = ''
-        for ids in soup.find_all('span'):
+        for ids in soup.find_all('p'):
             notice_str += ids.get_text()
 
-        notice_str = notice_str.replace(' ','')
-        notice_str = notice_str.replace('\xa0', '')
         notice_str = notice_str[0:int(len(notice_str)/2)]
         detail_dict[noticeID] = notice_str
 

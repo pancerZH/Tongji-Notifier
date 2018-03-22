@@ -9,7 +9,7 @@ def sendMail(sender,password,tolist,subject,body):
     server='smtp.qq.com'
     port=587
 
-    mBody=MIMEText(body,'plain','gbk')
+    mBody=MIMEText(body,'plain','GB18030')
     subject = Header(subject, 'utf-8').encode()
 
     header='To:'+';'.join(tolist)+'\n'
