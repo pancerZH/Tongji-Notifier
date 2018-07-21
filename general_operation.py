@@ -18,9 +18,7 @@ def act_with_database(note_dict):
             print('insert one tuple : {}'.format(key))
             notice_list.append(key)
             env_build.write_to_log('find new notification: {}'.format(note_dict[key]))
-        #else:
-            #print(result)
-    #cursor.execute('delete from notice where id=?',('5917',))
+
     cursor.close()
     conn.commit()
     conn.close()
