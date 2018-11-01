@@ -53,7 +53,6 @@ def login(header,s):
     message['RelayState']=soup.input.next_sibling.next_sibling['value']
     res=s.post(messURL,headers=header,data=message)
 
-
 def get_table(header, s):
     '''从4m3获取通知标题'''
     tableURL = 'http://4m3.tongji.edu.cn/eams/home!welcome.action'
