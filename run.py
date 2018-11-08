@@ -186,6 +186,5 @@ if __name__ == '__main__':
         run_service()
     elif len(sys.argv) > 1 and sys.argv[1] == 'now':
         run_now()
-        run_service()
     else:
         run_service()
