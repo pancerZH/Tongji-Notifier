@@ -32,7 +32,7 @@ def get_SSE_detail(notice_list, s):
         soup = BeautifulSoup(res.content,'html.parser')
         detail = ''
         for line in soup.find_all('p'):
-            detail += line.get_text()
+            detail += (line.get_text() + '\n')
     
         detail_dict[ids] = detail
         

@@ -78,7 +78,7 @@ def get_detail(header, s, notice_list):
         soup=BeautifulSoup(res.content,'html.parser')
         notice_str = ''
         for ids in soup.find_all('p'):
-            notice_str += ids.get_text()
+            notice_str += (ids.get_text() + '\n')
 
         notice_str = notice_str[0:int(len(notice_str)/2)]
         detail_dict[noticeID] = notice_str
