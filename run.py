@@ -9,7 +9,8 @@ import env_build
 import datetime
 import time
 import general_operation as go
-import extension as ex
+import extension_SSE as ex_SSE
+import extension_FAO as ex_FAO
 
 
 def login(header,s):
@@ -109,7 +110,8 @@ def deploy():
     note_dict = get_table(header,s)
     notice_list = go.act_with_database(note_dict)
     get_detail(header,s,notice_list)
-    ex.deploy_SSE()
+    ex_SSE.deploy_SSE()
+    ex_FAO.deploy_FAO()
     go.send_to_user({'1':'deploy succeed'},{'1':'begin service...'})
 
     s.close()
@@ -142,7 +144,8 @@ def run_now():
     detail_dict = get_detail(header,s,notice_list)
     go.send_to_user(note_dict,detail_dict)
 
-    ex.get_SSE_run()
+    ex_SSE.get_SSE_run()
+    ex_FAO.get_FAO_run()
     print('succeed!')
 
 
@@ -174,7 +177,8 @@ def run_service():
             detail_dict = get_detail(header,s,notice_list)
             go.send_to_user(note_dict,detail_dict)
 
-            ex.get_SSE_run()
+            ex_SSE.get_SSE_run()
+            ex_FAO.get_FAO_run()
             time.sleep(3700)
         else:
             time.sleep(100)

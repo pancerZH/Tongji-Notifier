@@ -1,3 +1,5 @@
+# -*- coding:utf-8 -*-
+
 import sqlite3
 import env_build
 import mail
