@@ -45,7 +45,7 @@ def get_SSE_run():
     notice_title_dict = get_SSE(s)
     notice_list = go.act_with_database(notice_title_dict)
     detail_dict = get_SSE_detail(notice_list,s)
-    go.send_to_user(notice_title_dict,detail_dict)
+    go.send_to_user(notice_title_dict,detail_dict,'软件学院')
 
 
 def deploy_SSE():

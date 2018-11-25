@@ -142,7 +142,7 @@ def run_now():
     note_dict = get_table(header,s)
     notice_list = go.act_with_database(note_dict)
     detail_dict = get_detail(header,s,notice_list)
-    go.send_to_user(note_dict,detail_dict)
+    go.send_to_user(note_dict,detail_dict,'4m3')
 
     ex_SSE.get_SSE_run()
     ex_FAO.get_FAO_run()
@@ -175,7 +175,7 @@ def run_service():
             note_dict = get_table(header,s)
             notice_list = go.act_with_database(note_dict)
             detail_dict = get_detail(header,s,notice_list)
-            go.send_to_user(note_dict,detail_dict)
+            go.send_to_user(note_dict,detail_dict,'4m3')
 
             ex_SSE.get_SSE_run()
             ex_FAO.get_FAO_run()

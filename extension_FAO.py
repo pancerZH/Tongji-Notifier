@@ -68,7 +68,7 @@ def get_FAO_run():
     ori_notice_list = go.act_with_database(notice_title_dict)
     notice_list = recover_url(ori_notice_list, noticeLink_title_dict, s)
     detail_dict = get_FAO_detail(notice_list, s)
-    go.send_to_user(noticeLink_title_dict, detail_dict)
+    go.send_to_user(noticeLink_title_dict, detail_dict, '外事办')
 
 
 def deploy_FAO():

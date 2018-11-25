@@ -28,9 +28,9 @@ def act_with_database(note_dict):
     return notice_list
 
 
-def send_to_user(note_dict, detail_dict):
+def send_to_user(note_dict, detail_dict, note_type='TJ_notifier'):
     """ 向每个用户发送通知邮件 """
-    """ note_dict是一个id-标题的字典，detail_dict是一个id-正文的字典 """
+    """ note_dict是一个id-标题的字典，detail_dict是一个id-正文的字典，note_type指代通知的来源 """
     conn = sqlite3.connect('TJ_notice.db')
     cursor = conn.cursor()
     cursor.execute('select * from user')
@@ -40,7 +40,7 @@ def send_to_user(note_dict, detail_dict):
         password = fp.readline().strip('\n')
 
     for key in detail_dict:
-        title = '【TJ_notifier】' + note_dict[key]
+        title = '【{}】'.format(note_type) + note_dict[key]
         body = detail_dict[key]
         mail_list = []
         for mail_address in result:
@@ -48,9 +48,9 @@ def send_to_user(note_dict, detail_dict):
 
         try:
             mail.sendMail(host_address,password,mail_list,title, body)
-            env_build.write_to_log('send a mail to {}'.format(mail_list))
+            env_build.write_to_log('send a mail {}'.format(note_dict[key]))
         except:
-            env_build.write_to_log('failed to send a mail to {}'.format(mail_list))
+            env_build.write_to_log('failed to send a mail {}'.format(note_dict[key]))
 
     cursor.close()
     conn.commit()
