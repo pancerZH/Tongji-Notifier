@@ -11,7 +11,7 @@ import general_operation as go
 def get_FAO(s):
     """ 获取第一页通知id和标题 """
     FAO_url = 'https://fao.tongji.edu.cn/4111/list.htm'
-    res = s.get(FAO_url)
+    res = s.get(FAO_url, verify=False)
     soup = BeautifulSoup(res.content, 'html.parser')
     noticeLink_title = {}
     for notice in soup.find_all(href=re.compile('c4111a')):
