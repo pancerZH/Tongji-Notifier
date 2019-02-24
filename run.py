@@ -63,7 +63,7 @@ def get_table(header, s):
     for ids in soup.find_all(onclick = re.compile('getNewNoticeInfo.*')):
         ori_str = ids['onclick']
         n_id = ori_str.split('\'')[1]
-        notice_dict[n_id] = ids.string
+        notice_dict[n_id] = ids.string.encode('gbk', 'ignore').decode('gbk')
 
     return notice_dict
 
